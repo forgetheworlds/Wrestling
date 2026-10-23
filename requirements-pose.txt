@@ -1,0 +1,7 @@
+mediapipe==0.10.21
+opencv-contrib-python==4.11.0.86
+numpy==1.26.4
+scipy==1.17.1
+mujoco==3.15.0
+pillow==12.3.0
+imageio==2.38.1
