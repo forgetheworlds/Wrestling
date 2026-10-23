@@ -1,0 +1,130 @@
+{
+ "about": "Base imitation spec. Costs (never wanted), then terminations, then rewards. Rewards are bounded in [0, 1] and normalised per stage kind ('*' for normal stages, 'hands' for stages with the hands posted on the mat).",
+ "cost_budget_default": 0.05,
+ "costs": {
+  "body_contact": {
+   "budget": 0.05,
+   "threshold": 0.0,
+   "scale": 1.0
+  },
+  "self_collision": {
+   "budget": 0.05
+  },
+  "joint_limit": {
+   "budget": 0.05
+  },
+  "torque_spike": {
+   "budget": 0.05,
+   "threshold": 0.9,
+   "scale": 0.1
+  },
+  "action_jerk": {
+   "budget": 0.05,
+   "threshold": 0.6,
+   "scale": 0.6
+  },
+  "contact_slip": {
+   "budget": 0.05,
+   "threshold": 0.1,
+   "scale": 0.2
+  },
+  "hold_jitter": {
+   "budget": 0.05
+  }
+ },
+ "lagrange": {
+  "eta_max": 0.25,
+  "lambda_lr": 0.01,
+  "penalty_cap": 0.5
+ },
+ "terminations": {
+  "fall_height": 0.18,
+  "et_root_dev": 0.45,
+  "et_torso_align": 0.75,
+  "et_torso_hdev": 0.2,
+  "et_upright_rel_deg": 60.0,
+  "root_drop": 0.2
+ },
+ "ground_contacts": {
+  "allowed": [
+   "feet"
+  ]
+ },
+ "sliding_allowed": false,
+ "rewards": {
+  "pose": {
+   "weight": 0.35,
+   "k": 8.0
+  },
+  "keypoints": {
+   "weight": 0.25,
+   "k": 10.0
+  },
+  "root": {
+   "weight": 0.3,
+   "k": 20.0
+  },
+  "contact": {
+   "weight": 0.1
+  },
+  "hand_keypoints": {
+   "weight": 0.0
+  },
+  "hold_smooth": {
+   "weight": 0.0
+  },
+  "cmd_vel": {
+   "weight": 0.0,
+   "k": 4.0
+  },
+  "cmd_yaw": {
+   "weight": 0.0,
+   "k": 2.0
+  },
+  "knee_flex": {
+   "weight": 0.0,
+   "min_deg": 40.0,
+   "sigma_deg": 10.0
+  },
+  "support_margin": {
+   "weight": 0.0,
+   "active_below_m": 0.04,
+   "scale_m": 0.04
+  },
+  "upright_bonus": {
+   "weight": 0.1,
+   "k": 4.0
+  }
+ },
+ "stage_weights": {
+  "hands": {
+   "pose": 0.2,
+   "keypoints": 0.15,
+   "root": 0.15,
+   "contact": 0.2,
+   "hand_keypoints": 0.2,
+   "hold_smooth": 0.1
+  }
+ },
+ "actuation": {
+  "pd_gains": "configs/gains/g1_soft.json",
+  "ff_torque": true,
+  "ff_vel": true
+ },
+ "robustness": {
+  "push": {
+   "prob": 0.0,
+   "force_n": 40.0,
+   "steps": 5
+  }
+ },
+ "env": {
+  "action_filter": 0.75,
+  "obs_prev_action": true,
+  "obs_yaw": true,
+  "rsi_joint_noise": 0.03,
+  "rsi_root_noise": 0.01,
+  "rsi_max_back": 3,
+  "clip_end_bonus": 2.0
+ }
+}

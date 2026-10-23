@@ -1,0 +1,8 @@
+.venv/
+.venv-pose/
+third_party/
+runs/
+work/
+__pycache__/
+*.pyc
+.DS_Store
