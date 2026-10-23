@@ -1,0 +1,25 @@
+{
+ "name": "shuffle_forward_smooth",
+ "extends": "shuffle_forward.json",
+ "about": "Smoothing fine-tune: action-rate, action-jerk and joint-acceleration penalties plus a tighter action-jerk cost budget.",
+ "reward": {
+  "env": {
+   "w_action_rate": 0.08,
+   "w_action_jerk": 0.04,
+   "w_dq_smooth": 0.04
+  },
+  "costs": {
+   "action_jerk": {
+    "budget": 0.015,
+    "threshold": 0.3,
+    "scale": 0.35
+   }
+  }
+ },
+ "train": {
+  "minutes": 40,
+  "lr": 1e-05,
+  "target_kl": 0.02,
+  "max_log_std": -1.5
+ }
+}

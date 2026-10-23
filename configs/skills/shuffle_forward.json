@@ -1,0 +1,25 @@
+{
+ "name": "shuffle_forward",
+ "about": "Forward wrestling shuffle, reference from video.",
+ "reward_spec": "shuffle",
+ "clips": [
+  {
+   "id": "forward",
+   "motion": "motions/shuffle_forward.npz",
+   "skill": "shuffle"
+  }
+ ],
+ "reward": {
+  "terminations": {
+   "et_torso_hdev": 0.3,
+   "root_drop": 0.3,
+   "et_root_dev": 0.6
+  }
+ },
+ "train": {
+  "minutes": 180,
+  "lr": 0.0003,
+  "target_kl": 0.08,
+  "max_log_std": -1.2
+ }
+}
