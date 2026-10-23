@@ -1,0 +1,45 @@
+{
+ "about": "Shuffles: feet only on the mat and allowed to slide, loosely tracked feet so the stance can widen, a knee-bend floor, support-margin shaping and tracking of the reference travel velocity.",
+ "base": "base",
+ "sliding_allowed": true,
+ "terminations": {
+  "et_root_dev": 0.6
+ },
+ "rewards": {
+  "pose": {
+   "weight": 0.27
+  },
+  "keypoints": {
+   "weight": 0.18,
+   "foot_weight": 0.3,
+   "foot_tol_m": 0.08
+  },
+  "root": {
+   "weight": 0.08
+  },
+  "contact": {
+   "weight": 0.08
+  },
+  "cmd_vel": {
+   "weight": 0.2,
+   "k": 4.0
+  },
+  "cmd_yaw": {
+   "weight": 0.07,
+   "k": 2.0
+  },
+  "knee_flex": {
+   "weight": 0.07,
+   "min_deg": 45.0,
+   "sigma_deg": 10.0,
+   "stages": [
+    "*"
+   ]
+  },
+  "support_margin": {
+   "weight": 0.05,
+   "active_below_m": 0.04,
+   "scale_m": 0.04
+  }
+ }
+}

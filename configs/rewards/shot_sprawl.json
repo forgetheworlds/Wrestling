@@ -1,0 +1,13 @@
+{
+ "about": "Shots and sprawls: feet and knees may touch the mat.",
+ "base": "base",
+ "ground_contacts": {
+  "allowed": [
+   "feet",
+   "knees"
+  ]
+ },
+ "terminations": {
+  "et_upright_rel_deg": 60.0
+ }
+}

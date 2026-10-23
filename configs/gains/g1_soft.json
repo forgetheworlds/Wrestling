@@ -1,0 +1,14 @@
+{
+ "about": "Per-joint PD gains (kp in Nm/rad, kd in Nm*s/rad) and action scale (rad per unit action), sized per motor after the Unitree G1 defaults. The first key that is a substring of the actuator name wins. kp * action_scale is the torque a full action adds: hips 40 Nm, knees 60 Nm, ankles 20 Nm.",
+ "joints": {
+  "hip_pitch":  {"kp": 100, "kd": 2.5, "action_scale": 0.4},
+  "hip_roll":   {"kp": 100, "kd": 2.5, "action_scale": 0.4},
+  "hip_yaw":    {"kp": 100, "kd": 2.5, "action_scale": 0.4},
+  "knee":       {"kp": 150, "kd": 4.0, "action_scale": 0.4},
+  "ankle":      {"kp": 40,  "kd": 2.0, "action_scale": 0.5},
+  "waist":      {"kp": 60,  "kd": 3.0, "action_scale": 0.4},
+  "shoulder":   {"kp": 40,  "kd": 2.0, "action_scale": 0.5},
+  "elbow":      {"kp": 40,  "kd": 2.0, "action_scale": 0.5},
+  "wrist":      {"kp": 20,  "kd": 1.5, "action_scale": 0.5}
+ }
+}
