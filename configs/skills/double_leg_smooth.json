@@ -1,0 +1,24 @@
+{
+ "name": "double_leg_smooth",
+ "extends": "double_leg.json",
+ "about": "Smoothing fine-tune with very light penalties; stronger ones cost completion on the shot.",
+ "augment": {
+  "yaw_deg": [
+   0,
+   0
+  ]
+ },
+ "reward": {
+  "env": {
+   "w_action_rate": 0.005,
+   "w_action_jerk": 0.002,
+   "w_dq_smooth": 0.005
+  }
+ },
+ "train": {
+  "minutes": 45,
+  "lr": 1e-05,
+  "target_kl": 0.03,
+  "max_log_std": -1.2
+ }
+}

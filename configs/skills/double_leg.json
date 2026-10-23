@@ -1,0 +1,40 @@
+{
+ "name": "double_leg",
+ "about": "Solo double-leg shot (penetration step, right knee down, drive through and back up). Hand-keyed reference.",
+ "reward_spec": "shot_sprawl",
+ "clips": [
+  {
+   "id": "shot",
+   "motion": "motions/double_leg.npz",
+   "skill": "shot",
+   "reward": {
+    "ground_contacts": {
+     "allowed": [
+      "feet",
+      "knees",
+      "shins"
+     ]
+    }
+   }
+  }
+ ],
+ "augment": {
+  "yaw_deg": [
+   -20,
+   20
+  ],
+  "yaw_bins": 5
+ },
+ "reward": {
+  "env": {
+   "act_scale_mult": 0.5
+  }
+ },
+ "train": {
+  "minutes": 180,
+  "workers": 4,
+  "lr": 0.0003,
+  "target_kl": 0.08,
+  "max_log_std": -1.2
+ }
+}

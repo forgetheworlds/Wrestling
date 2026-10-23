@@ -1,0 +1,55 @@
+{
+ "name": "sprawl",
+ "about": "Sprawl with the hands posted on the mat, reference from video. Work in progress.",
+ "reward_spec": "shot_sprawl",
+ "clips": [
+  {
+   "id": "sprawl",
+   "motion": "motions/sprawl.npz",
+   "skill": "sprawl",
+   "reward": {
+    "sliding_allowed": true,
+    "ground_contacts": {
+     "allowed": [
+      "feet",
+      "hands",
+      "knees",
+      "shins",
+      "hips"
+     ]
+    },
+    "terminations": {
+     "root_drop": 0.3,
+     "et_torso_hdev": 0.3,
+     "et_upright_rel_deg": 60.0,
+     "et_fall_height_rel": 0.25,
+     "et_torso_align": 0.5,
+     "et_root_dev": 0.6
+    },
+    "stage_weights": {
+     "hands": {
+      "pose": 0.2,
+      "keypoints": 0.15,
+      "root": 0.1,
+      "contact": 0.2,
+      "hand_keypoints": 0.25,
+      "hold_smooth": 0.1
+     }
+    }
+   }
+  }
+ ],
+ "reward": {
+  "env": {
+   "act_scale_mult": 0.5,
+   "hand_collision": true
+  }
+ },
+ "train": {
+  "minutes": 240,
+  "workers": 4,
+  "lr": 0.00015,
+  "lr_final_frac": 0.33,
+  "max_log_std": -1.2
+ }
+}

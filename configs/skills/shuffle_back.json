@@ -1,0 +1,26 @@
+{
+ "name": "shuffle_back",
+ "about": "Backward shuffle, reference from video. Work in progress.",
+ "reward_spec": "shuffle",
+ "clips": [
+  {
+   "id": "back",
+   "motion": "motions/shuffle_back.npz",
+   "skill": "shuffle"
+  }
+ ],
+ "reward": {
+  "terminations": {
+   "et_torso_hdev": 0.3,
+   "root_drop": 0.3,
+   "et_root_dev": 0.6
+  }
+ },
+ "train": {
+  "minutes": 240,
+  "workers": 4,
+  "lr": 0.00015,
+  "lr_final_frac": 0.33,
+  "max_log_std": -1.2
+ }
+}
