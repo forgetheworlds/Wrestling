@@ -99,7 +99,7 @@ def _evaluate(args):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("config", help="skill config JSON")
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out", help="run directory (default runs/<config name>)")
     ap.add_argument("--init", default="", help="checkpoint to start from")
     ap.add_argument("--minutes", type=float, help="override the config's training time budget")
     ap.add_argument("--workers", type=int, help="override the config's worker count")
@@ -123,7 +123,7 @@ def main():
     lagrange = skill["lagrange"]
     budget = np.asarray(lagrange["budgets"], float)
     lam = np.zeros(len(budget))
-    out = Path(a.out)
+    out = Path(a.out or f"runs/{skill['name']}")
     out.mkdir(parents=True, exist_ok=True)
     (out / "config.json").write_text(
         json.dumps({"config": str(a.config), "init": a.init, "train": tr}, indent=1)

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 
+from wrestling.clip import check
 from wrestling.evaluate import evaluate
 from wrestling.policy import load_checkpoint
 from wrestling.pose.annotate import stages_and_contacts
@@ -33,6 +34,7 @@ class MotionTest(unittest.TestCase):
             z = np.load(path)
             meta = json.loads(str(z["meta_json"]))
             with self.subTest(motion=path.stem):
+                self.assertEqual(check(path), ([], []))
                 self.assertEqual(z["qpos"].shape[1], 36)
                 self.assertEqual(len(z["qpos"]), meta["n_frames"])
                 np.testing.assert_allclose(np.linalg.norm(z["qpos"][:, 3:7], axis=1), 1.0, atol=1e-6)
