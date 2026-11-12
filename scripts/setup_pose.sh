@@ -4,9 +4,16 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PYTHON="${PYTHON:-python3.12}"
-"$PYTHON" -m venv .venv-pose
-.venv-pose/bin/pip install -q --upgrade pip
-.venv-pose/bin/pip install -q -r requirements-pose.txt
+if command -v "$PYTHON" >/dev/null; then
+  "$PYTHON" -m venv .venv-pose
+  .venv-pose/bin/pip install -q --upgrade pip
+  .venv-pose/bin/pip install -q -r requirements-pose.txt
+elif command -v uv >/dev/null; then
+  uv venv -q -p 3.12 .venv-pose
+  VIRTUAL_ENV=.venv-pose uv pip install -q -r requirements-pose.txt
+else
+  echo "need python3.12 (or uv to fetch it)"; exit 1
+fi
 
 mkdir -p third_party
 MODEL=third_party/pose_landmarker_heavy.task

@@ -16,6 +16,7 @@ from pathlib import Path
 import mujoco
 import numpy as np
 
+from . import PHYSICS
 from .costs import ConstraintTerms
 from .feedforward import ff_ctrl_offset, reference_torque
 from .robot import (
@@ -32,8 +33,8 @@ from .robot import (
 
 @dataclass
 class EnvConfig:
-    timestep: float = 0.002
-    frame_skip: int = 10
+    timestep: float = PHYSICS["timestep"]
+    frame_skip: int = PHYSICS["frame_skip"]
     episode_seconds: float = 5.0
     # actuation
     action_scale: float = 0.25  # used when the gains file has no per-joint action scale

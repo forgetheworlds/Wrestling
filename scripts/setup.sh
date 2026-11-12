@@ -4,7 +4,9 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PYTHON="${PYTHON:-python3}"
-MENAGERIE_COMMIT=f054586a8e90465d49ee5be15335c4a0c7f57caf
+"$PYTHON" -c 'import sys; sys.exit(sys.version_info < (3, 12))' \
+  || { echo "need Python 3.12 or newer (set PYTHON=python3.12)"; exit 1; }
+MENAGERIE_COMMIT=$("$PYTHON" -c 'import json; print(json.load(open("configs/mujoco.json"))["menagerie_commit"])')
 
 "$PYTHON" -m venv .venv
 .venv/bin/pip install -q --upgrade pip
@@ -23,4 +25,5 @@ if [[ ! -f third_party/unitree_g1/g1.xml ]]; then
   rm -rf "$tmp"
 fi
 
+.venv/bin/python -c 'import mujoco; from wrestling.robot import build_model; build_model(); print("mujoco", mujoco.__version__, "+ G1 ok")'
 echo "ready: source .venv/bin/activate"

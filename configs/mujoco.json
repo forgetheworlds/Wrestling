@@ -1,0 +1,14 @@
+{
+ "about": "MuJoCo version, robot model and physics settings shared by training, evaluation and rendering. Motions are played at 1 / (timestep * frame_skip) = 50 Hz.",
+ "mujoco": "3.15.0",
+ "menagerie_commit": "f054586a8e90465d49ee5be15335c4a0c7f57caf",
+ "timestep": 0.002,
+ "frame_skip": 10,
+ "integrator": "implicitfast",
+ "solver": "newton",
+ "iterations": 100,
+ "ls_iterations": 50,
+ "cone": "pyramidal",
+ "floor_friction": [1.2, 0.005, 0.0001],
+ "headless_gl": "egl"
+}

@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import json
 import os
+import warnings
 from contextlib import contextmanager
 from pathlib import Path
 
 import mujoco
 import numpy as np
 
-from . import ROOT
+from . import PHYSICS, ROOT
 
 G1_DIR = Path(os.environ.get("WRESTLING_G1_DIR", ROOT / "third_party/unitree_g1"))
 G1_XML = G1_DIR / "g1.xml"
@@ -32,24 +33,35 @@ def _in_dir(path: Path):
         os.chdir(prev)
 
 
-def build_model(timestep: float = 0.002, hand_collision: bool = False) -> mujoco.MjModel:
+def _check_version() -> None:
+    if mujoco.__version__ != PHYSICS["mujoco"]:
+        msg = f"MuJoCo {mujoco.__version__} installed, results were produced with {PHYSICS['mujoco']}"
+        warnings.warn(msg, stacklevel=3)
+
+
+def build_model(timestep: float = PHYSICS["timestep"], hand_collision: bool = False) -> mujoco.MjModel:
     """G1 on a flat mat.
 
     Menagerie only gives the wrist links collision geoms, so the rubber hands float above the
     mat in poses where the hands are posted. `hand_collision` makes the hand meshes collide.
     """
+    _check_version()
     if not G1_XML.exists():
         raise FileNotFoundError(f"{G1_XML} not found. Run scripts/setup.sh to fetch the Unitree G1 model.")
     with _in_dir(G1_DIR):
         spec = mujoco.MjSpec()
         spec.modelname = "g1_wrestling"
-        spec.option.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
         spec.option.timestep = timestep
+        spec.option.integrator = getattr(mujoco.mjtIntegrator, "mjINT_" + PHYSICS["integrator"].upper())
+        spec.option.solver = getattr(mujoco.mjtSolver, "mjSOL_" + PHYSICS["solver"].upper())
+        spec.option.cone = getattr(mujoco.mjtCone, "mjCONE_" + PHYSICS["cone"].upper())
+        spec.option.iterations = PHYSICS["iterations"]
+        spec.option.ls_iterations = PHYSICS["ls_iterations"]
         floor = spec.worldbody.add_geom()
         floor.name = "floor"
         floor.type = mujoco.mjtGeom.mjGEOM_PLANE
         floor.size[:] = [0, 0, 0.05]
-        floor.friction[:] = [1.2, 0.005, 0.0001]
+        floor.friction[:] = PHYSICS["floor_friction"]
         floor.rgba[:] = [0.2, 0.25, 0.3, 1.0]
         robot = mujoco.MjSpec.from_file(str(G1_XML))
         robot.meshdir = str(G1_DIR / "assets")
