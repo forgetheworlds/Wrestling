@@ -69,47 +69,50 @@ Both finished policies were trained in two stages:
 
 ## Quick start
 
-Tested on Linux with Python 3.13 (set `PYTHON=` to choose the interpreter).
+Linux, Python 3.12 or newer, CPU only. Headless machines render through EGL
+(`sudo apt install libegl1 libgl1-mesa-dri` on Debian/Ubuntu).
 
 ```bash
 scripts/setup.sh            # .venv with pinned dependencies + the Unitree G1 model from MuJoCo Menagerie
 source .venv/bin/activate
-python -m unittest          # checkpoints still complete their clips
+scripts/smoke.sh            # tests, a short training run, evaluation and a render (about 2 minutes)
 ```
+
+The MuJoCo version, timestep, solver and headless render backend are in
+[`configs/mujoco.json`](configs/mujoco.json). Skills are referred to by their config name in `configs/skills/`.
 
 Evaluate and render the included checkpoints:
 
 ```bash
-python -m wrestling.evaluate configs/skills/double_leg_smooth.json checkpoints/double_leg.npz
-python -m wrestling.evaluate configs/skills/shuffle_forward_smooth.json checkpoints/shuffle_forward.npz
-
-MUJOCO_GL=egl python -m wrestling.render configs/skills/double_leg_smooth.json checkpoints/double_leg.npz --out double_leg.mp4
+python -m wrestling.evaluate double_leg_smooth checkpoints/double_leg.npz
+python -m wrestling.evaluate shuffle_forward_smooth checkpoints/shuffle_forward.npz
+python -m wrestling.render double_leg_smooth checkpoints/double_leg.npz --out double_leg.mp4
 ```
-
-(`MUJOCO_GL=egl` is for headless Linux; leave it out on a desktop.)
 
 Train from scratch, then fine-tune:
 
 ```bash
-python -m wrestling.train configs/skills/double_leg.json --out runs/double_leg
-python -m wrestling.train configs/skills/double_leg_smooth.json --init runs/double_leg/best.npz --out runs/double_leg_smooth
+python -m wrestling.train double_leg
+python -m wrestling.train double_leg_smooth --init runs/double_leg/best.npz
 ```
 
 Training uses one CPU process per worker (`--workers`, default from the config) and stops after the
 config's time budget (`--minutes` to override). Logs go to `runs/<name>/train.jsonl`; `best.npz` is the
 checkpoint with the best evaluation.
 
-## Your own video
+## New moves
 
-The pose step needs MediaPipe, which lives in a separate Python 3.12 environment:
+Film a clip, turn it into a G1 motion, check it, and add a config of a few lines:
 
 ```bash
-scripts/setup_pose.sh                        # .venv-pose + the MediaPipe pose model
-scripts/video_to_motion.sh my_clip.mp4 my_skill
+scripts/setup_pose.sh                                  # once: MediaPipe environment
+scripts/video_to_motion.sh my_clip.mp4 my_move         # -> motions/my_move.npz
+python -m wrestling.clip check motions/my_move.npz
+python -m wrestling.train my_move                      # after adding configs/skills/my_move.json
 ```
 
-This writes `motions/my_skill.npz`, the gate report in `work/my_skill/gate.json` and a side-by-side
-check video in `work/my_skill/`. Copy one of the skill configs, point its clip at the new motion and train.
+Motions from other retargeters come in as CSV (`python -m wrestling.clip import`). The file format,
+config fields and a worked example are in [docs/EXTENDING.md](docs/EXTENDING.md).
 
 ## Layout
 
@@ -123,8 +126,10 @@ wrestling/
   train.py        parallel rollouts, Lagrange updates, evaluation, checkpoints
   evaluate.py     multi-seed evaluation
   render.py       policy vs reference video
+  clip.py         motion file checks and CSV import
   pose/           video -> keypoints -> G1 motion, contact annotation, comparison video
 configs/
+  mujoco.json     MuJoCo version and physics settings
   skills/         one file per skill: clips, reward overrides, training settings
   rewards/        shared reward specs
   gains/          PD gains

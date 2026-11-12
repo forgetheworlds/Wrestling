@@ -1,0 +1,6 @@
+{
+ "name": "shuffle_left",
+ "extends": "shuffle_forward.json",
+ "about": "Side shuffle to the left, reference from video.",
+ "clips": [{"id": "left", "motion": "motions/shuffle_left.npz", "skill": "shuffle"}]
+}
