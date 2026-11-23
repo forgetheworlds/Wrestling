@@ -86,33 +86,80 @@ uv run src/supermimic/scripts/train.py SuperMimic-GenCoord-G1 \
 The upstream loader accepts multiple NPZ clips. Each clip retains its own
 boundaries; reference windows and reset sampling must respect those boundaries.
 
-## Data progression
+## Dataset strategy: original wrestling footage first
 
-**A. Motion quality:** For every motion, inspect root/limb trajectories and
-contacts before training. Review foot/hand/knee placement, motion timing,
-penetration, joint angular velocity and acceleration, start/end poses, and
-feasibility with the target G1 joint limits. For camera clips, compare both
-image reprojection and 3-D physical plausibility. Fix impossible references
-upstream instead of asking the policy to imitate them.
+The primary data source is the project owner's **self-recorded wrestling-drill videos**.
+Use external motion capture **selectively** for falling, rolling, stabilizing,
+getting up from the mat, and returning to a standing wrestling stance. General
+walking and balancing examples are supplemental, not the dataset's purpose.
 
-**B. General movement data:** Add a compatible, licensed G1-retargeted subset
-of BONES-SEED or LAFAN1 to cover balance, walking, turning, stepping, and
-getting up. Validate joint order and compatibility with the same mjlab asset.
-Wrestling motions should be sampled deliberately so that the large general
-dataset does not drown out rare transitions.
+Three data families:
 
-**C. Wrestling-specific data:** Record several clear repetitions at different
-speeds and starting configurations, including an actual sprawl with hand
-posting and recovery. One clean repetition is enough to test tracking; multiple
-variations are needed to test robustness and avoid overfitting a single clip.
+1. **Wrestling:** stance, stance hold, forward/backward/side shuffles, level
+   changes, penetration steps, double-leg entries, sprawling, sit-outs,
+   technical stand-ups, and recovery to stance. Record multiple trials per
+   movement, including distinct speeds, stances, and approach directions.
+2. **Recovery mocap:** supine/prone/left-side/right-side to upright, kneeling
+   or seated to upright, roll-to-kneel, stumble recovery, and fall-to-stand
+   trajectories. Keep full transitions with meaningful beginning and ending.
+3. **Simulator-generated recovery conditions:** randomized orientation, joint
+   pose, small disturbances, friction and COM perturbations, and imperfect
+   starts, applied **only within physically feasible and mechanically safe
+   states**. This is robustness training, not a source of human mocap.
 
-**D. Contact:** SuperMimic's reference format is kinematic. It does not need
-measured force-plate trajectories. Ground reaction forces arise in MuJoCo
-during training. Preserve contact labels for evaluation, use non-penetrating
-contact-consistent references, and inspect normal forces/impulses at feet,
-knees and hands in rollouts. For sprawls and sit-outs, verify that the
-simulator's G1 has physical hand and knee collision geometry and does not
-treat intended floor contacts as fatal falls.
+Prioritize data quality over clip count. Keep a traceable manifest with source,
+permission/license, subject/session, original fps, movement, retargeting
+version, contact labels, quality score, and whether a clip is allowed to be
+redistributed. Do not mix train and test frames from the same recording.
+
+### Verified external sources and permissions
+
+- [Ubisoft La Forge LAFAN1](https://github.com/ubisoft/ubisoft-laforge-animation-dataset):
+  6 fall-and-get-up, 2 push-and-fall, 3 push-and-stumble, and 5 ground
+  movement sequences. An [existing G1 retarget](https://huggingface.co/datasets/lvhaidong/LAFAN1_Retargeting_Dataset)
+  is available; check kinematic feasibility in our G1 model. Source motion
+  license is CC BY-NC-ND 4.0. Do not assume that processed references may be
+  redistributed.
+- [CMU Mocap Subject 140](https://mocap.cs.cmu.edu/search.php?subjectnumber=140):
+  9 getting-up-from-ground trials. CMU's original database permits broad
+  reuse but forbids direct resale of the dataset. Retarget to G1 and verify.
+- [SFU Mocap](https://mocap.cs.sfu.ca/):
+  research-only floor/parkour rolls; cannot use in commercial products.
+- [BABEL/AMASS](https://babel.is.tue.mpg.de/):
+  semantic labels and third-party mocap for locating additional recovery
+  motions, subject to their non-commercial and redistribution restrictions.
+
+**Do not presume BONES-SEED is a freely distributable open dataset.** Bones
+Studio's official data is gated under a proprietary license and should not be
+used or redistributed without permission. It is not needed for the initial plan.
+
+### Capture protocol for primary wrestling motion
+
+Use a fixed camera with the entire body and mat visible, consistent fps and
+lighting, known scale/calibration, and 1–2 seconds of stable start and end.
+Prefer synchronized side and front/oblique views for floor maneuvers with
+self-occlusion, recorded at 60 fps or higher when available. Capture multiple
+natural repetitions, not edited copies. Tag likely contact periods for each
+foot, hand and knee, with confidence rather than fabricated force values.
+Retarget to G1, filter jitter without erasing timing, validate contacts and
+joint limits, then replay in mjlab before accepting the motion.
+
+### Training / sampling
+
+Start with one clip per skill for pipeline verification. Then build a balanced
+multimotion library using *episode/clip sampling*, not raw frame count:
+consider an initial 60% wrestling / 30% recovery / 10% other locomotion as a
+**tunable experiment**, not a proven optimum. Within wrestling, oversample
+difficult, underrepresented transitions such as hand-posting sprawls.
+Compare held-out repetitions and new recording sessions to training results.
+
+A reference-conditioned tracker performs the supplied clip; by itself it does
+**not** decide how to get up after an arbitrary unexpected fall. Once tracked
+get-up trajectories work, add a narrow recovery-mode selector that routes
+measured robot state (supine, prone, side, kneeling, etc.) to an achievable
+recovery reference. Train perturbation recovery within the simulator and
+measure success under a range of starts, rather than claiming that literally
+every fall is recoverable.
 
 ## Evaluation contract
 
